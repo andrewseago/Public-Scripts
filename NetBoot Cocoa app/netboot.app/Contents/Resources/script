@@ -1,0 +1,25 @@
+#!/bin/sh
+# Casper_Restore_netboot.sh
+# 
+# 
+# Created by Andrew Seago on 02/08/2012.
+#
+# set -x	# DEBUG. Display commands and their arguments as they are executed
+# set -v	# VERBOSE. Display shell input lines as they are read.
+# set -n	# EVALUATE. Check syntax of the script but dont execute
+
+# Username with access to http share
+DPusername=""
+DPpassword=""
+
+# URL to http DP (jssdp.yourcompany.com:80)
+jssDPurl=""
+
+# Uncomment this if your JSS DP needs authentication
+# curl -u "$DPusername":"$DPpassword" "$jssDPurl"/CasperShare/Scripts/netboot_servers.sh > /var/tmp/netboot_servers.sh
+
+# Use this if your DP does not need authentication
+curl "$jssDPurl"/CasperShare/Scripts/netboot_servers.sh > /var/tmp/netboot_servers.sh
+chmod 777 /var/tmp/netboot_servers.sh
+/var/tmp/netboot_servers.sh
+exit 0
