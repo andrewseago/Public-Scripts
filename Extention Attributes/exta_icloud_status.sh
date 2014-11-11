@@ -1,7 +1,7 @@
 #!/bin/sh
 # exta_icloud_status.sh
 # 
-# This extention attribute checks all users over UID 500 for their Keychain Sync and iCloud Drive / iCloud Document Sync status
+# This extension attribute checks all users over UID 500 for their Keychain Sync and iCloud Drive / iCloud Document Sync status
 # In Casper Results will look like this:
 #	Username=User1 KeyChainStatus=true DocSyncStatus=true
 #	Username=User2 KeyChainStatus=false DocSyncStatus=true
@@ -41,6 +41,11 @@ for userAccount in ${userList[@]}; do
 		fi
 	else
 		KeyChainStatus='NA'
+		DocSyncStatus='NA'
+	fi
+	if [ "$KeyChainStatus" == "" ]; then
+		KeyChainStatus='NA'
+	elif [ "$DocSyncStatus" == "" ]; then
 		DocSyncStatus='NA'
 	fi
 	if [ "$ReconReport" == "" ]; then
