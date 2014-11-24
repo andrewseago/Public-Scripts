@@ -4,7 +4,7 @@
 #
 # Used to install multiple PKG containing DMGs and PKGs to a target drive based on what folders they are in
 # Created by andrewws on 11/24/14.
-set -x	# DEBUG. Display commands and their arguments as they are executed
+# set -x	# DEBUG. Display commands and their arguments as they are executed
 # set -v	# VERBOSE. Display shell input lines as they are read.
 # set -n	# EVALUATE. Check syntax of the script but dont execute
 
