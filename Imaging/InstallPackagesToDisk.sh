@@ -4,7 +4,7 @@
 #
 # Used to install multiple PKG containing DMGs and PKGs to a target drive based on what folders they are in
 # Created by andrewws on 11/24/14.
-# set -x	# DEBUG. Display commands and their arguments as they are executed
+set -x	# DEBUG. Display commands and their arguments as they are executed
 # set -v	# VERBOSE. Display shell input lines as they are read.
 # set -n	# EVALUATE. Check syntax of the script but dont execute
 
@@ -61,6 +61,8 @@ mountPointDMG="/private/var/tmp/.mountDMG"
 #################################################################################################### 
 ## Install Packages function
 install_DMG_Directory() {
+	SAVEIFS=$IFS
+	IFS=$'\n'
 	for dmgFile in `ls -1 "$DMG_Directory" | grep "dmg"`; do
 		rm $mountPointDMG
 		fullPathToDMG="$DMG_Directory/$dmgFile"
@@ -95,25 +97,29 @@ install_DMG_Directory() {
 			hdiutil detach "$mountDevice" -force
 		fi
 	done
+	IFS=$SAVEIFS
 }
 
 function install_PKG_Directory () {
-	for pkgFile in `ls -1 "$PKG_Directory" | grep "pkg"`; do
+	SAVEIFS=$IFS
+	IFS=$'\n'
+	for pkgFile in $(ls -1 "$PKG_Directory" | grep "pkg"); do
 		echo "installing package $pkgFile from dmg $dmgFile"
 		installer -package "$PKG_Directory/$pkgFile" -target "$TargetDisk"
 		if [ $? == 0 ]; then
-			echo "$pkgFile installed successfully" 
+			echo "${pkgFile} installed successfully" 
 		else
-			echo "$pkgFile installation failed.  Exit code: $?"
+			echo "${pkgFile} installation failed.  Exit code: $?"
 			echo "Attempting to install again with Verbose Logging"
 			installer -package "$PKG_Directory/$pkgFile" -target "$TargetDisk" -verboseR
 			if [ $? == 0 ]; then
-				echo "$pkgFile installed successfully"
+				echo "${pkgFile} installed successfully"
 			else
-				echo "$pkgFile installation failed.  Exit code: $?"
+				echo "${pkgFile} installation failed.  Exit code: $?"
 			fi
 		fi	
 	done
+	IFS=$SAVEIFS
 }
 ## Script
 #################################################################################################### 
