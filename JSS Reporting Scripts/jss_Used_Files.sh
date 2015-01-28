@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # jss_Used_Files.sh
 # 
 # This script will parse through all Policies and Image Configurations in the JSS specified for all Packages and Scripts being used. 
@@ -32,7 +32,7 @@ function VerifyVariables () {
 	fi
 	if [ "$password" == "" ]; then
 		echo "what is the api username password?"
-		read password
+		read -s password
 	fi
 	if [[ ! -d "$output" ]] || [[ "$output" == "" ]]; then
 		echo "What is the output directory?"
