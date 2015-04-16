@@ -24,7 +24,7 @@ output=''
 function VerifyJQ () {
     which jq &>/dev/null
     if [[ $? -ne 0 ]]; then
-        echo "ERROR: This script requires the jq binary to be installed."
+        echo "ERROR: Please install jq from http://stedolan.github.io/jq/"
         exit 1
     fi
 }

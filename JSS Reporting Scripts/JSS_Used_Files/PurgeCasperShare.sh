@@ -20,8 +20,9 @@ outputPlist=""
 
 ## Functions
 ####################################################################################################
+
 function InitiateScript () {
-	CheckIfjq
+	VerifyJQ
 	VerifyVariables
 	PurgePackages
 	PurgeScripts
@@ -54,6 +55,7 @@ Press Return to Continue"
 	fi
 	outputPlist="$output/results.plist"
 }
+
 function PurgePackages () {
 	OLDIFS=$IFS
 	IFS=$'\n'
@@ -71,6 +73,7 @@ function PurgePackages () {
 	done
 	IFS=$OLDIFS
 }
+
 function PurgeScripts () {
 	OLDIFS=$IFS
 	IFS=$'\n'
@@ -82,11 +85,13 @@ function PurgeScripts () {
 	done
 	IFS=$OLDIFS
 }
-function CheckIfjq () {
-	if [ ! -e /usr/sbin/jq ]; then
-		echo "Please install jq from http://stedolan.github.io/jq/"
-		exit 0
-	fi
+
+function VerifyJQ () {
+    which jq &>/dev/null
+    if [[ $? -ne 0 ]]; then
+        echo "ERROR: Please install jq from http://stedolan.github.io/jq/"
+        exit 1
+    fi
 }
 
 ## Script
