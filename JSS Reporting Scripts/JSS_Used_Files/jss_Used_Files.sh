@@ -1,7 +1,7 @@
 #!/bin/bash
 # jss_Used_Files.sh
-# 
-# This script will parse through all Policies and Image Configurations in the JSS specified for all Packages and Scripts being used. 
+#
+# This script will parse through all Policies and Image Configurations in the JSS specified for all Packages and Scripts being used.
 # It will then compare the used files to the ones currently in your JSS and provide two seperate reports for each used and un-used files.
 #
 # Note: The username given to the script must have JSS API read access to the following: policies  computerconfigurations packages scripts
@@ -12,14 +12,14 @@
 # set -n	# EVALUATE. Check syntax of the script but dont execute
 
 ## Variables
-#################################################################################################### 
+####################################################################################################
 jssUrl=''
 username=''
 password=''
 output=''
 
 ## Functions
-#################################################################################################### 
+####################################################################################################
 
 function VerifyVariables () {
 	if [ "$jssUrl" == "" ]; then
@@ -51,7 +51,7 @@ function GetAPIid () {
 		echo "ERROR $output/JSS_Used_Files/$jssAPItable/ID_$jssAPItable.xml not dowloaded"
 		exit 0
 	fi
-	idCount=`wc -l "$output/JSS_Used_Files/$jssAPItable/ID_$jssAPItable.xml" | awk '{print$1}'`
+	idCount=$(wc -l "$output/JSS_Used_Files/$jssAPItable/ID_$jssAPItable.xml" | awk '{print$1}')
 	myCount=0
 	for apiObject in $(cat "$output/JSS_Used_Files/$jssAPItable/ID_$jssAPItable.xml"); do
 		#clear
@@ -81,7 +81,7 @@ function GetScriptFilename () {
 	IFS=$'\n'
 	for scriptID in $(cat "$output/JSS_Used_Files/scriptIDS.txt"); do
 		if [ "$scriptID" != "" ]; then
-			scriptFilename=`curl -k -s -u "$username":"$password" "$jssUrl/JSSResource/scripts/id/$scriptID" | grep -e "<name>" | sed -e 's,.*<name>\([^<]*\)</name>.*,\1,g'`
+			scriptFilename=$(curl -k -s -u "$username":"$password" "$jssUrl/JSSResource/scripts/id/$scriptID" | grep -e "<name>" | sed -e 's,.*<name>\([^<]*\)</name>.*,\1,g')
 			wPlist "Scripts:$scriptID" "$scriptFilename" "$outputPlist"
 		fi
 	done
@@ -93,7 +93,7 @@ function GetPackageFilename () {
 	IFS=$'\n'
 	for packageID in $(cat "$output/JSS_Used_Files/packageIDS.txt"); do
 		if [ "$packageID" != "" ]; then
-			packageFilename=`curl -k -s -u "$username":"$password" "$jssUrl/JSSResource/packages/id/$packageID" | grep -e "<filename>" | sed -e 's,.*<filename>\([^<]*\)</filename>.*,\1,g'`
+			packageFilename=$(curl -k -s -u "$username":"$password" "$jssUrl/JSSResource/packages/id/$packageID" | grep -e "<filename>" | sed -e 's,.*<filename>\([^<]*\)</filename>.*,\1,g')
 			wPlist "Packages:$packageID" "$packageFilename" "$outputPlist"
 		fi
 	done
@@ -109,12 +109,12 @@ function GetAPIobject () {
 }
 
 function PrintResult () {
-	declare -i PackageCount=`/usr/libexec/PlistBuddy -c "Print :Packages" "$outputPlist" | grep '=' | awk '{print$1}' | wc -l | awk '{print$1}'`
-	declare -i ImagingPkgCount=`/usr/libexec/PlistBuddy -c "Print :ImagingPackages" "$outputPlist" | grep '=' | awk '{print$1}' | wc -l | awk '{print$1}'`
-	scriptCount=`/usr/libexec/PlistBuddy -c "Print :Scripts" "$outputPlist" | grep '=' | awk '{print$1}' | wc -l | awk '{print$1}'`
-	unusedPKGsCount=`/usr/libexec/PlistBuddy -c "Print :Unused_Packages" "$outputPlist" | grep '=' | awk '{print$1}' | wc -l | awk '{print$1}'`
-	unusedScriptsCount=`/usr/libexec/PlistBuddy -c "Print :Unused_Scripts" "$outputPlist" | grep '=' | awk '{print$1}' | wc -l | awk '{print$1}'`
-	pkgCount=`expr $PackageCount + $ImagingPkgCount`
+	declare -i PackageCount=$(/usr/libexec/PlistBuddy -c "Print :Packages" "$outputPlist" | grep '=' | awk '{print$1}' | wc -l | awk '{print$1}')
+	declare -i ImagingPkgCount=$(/usr/libexec/PlistBuddy -c "Print :ImagingPackages" "$outputPlist" | grep '=' | awk '{print$1}' | wc -l | awk '{print$1}')
+	scriptCount=$(/usr/libexec/PlistBuddy -c "Print :Scripts" "$outputPlist" | grep '=' | awk '{print$1}' | wc -l | awk '{print$1}')
+	unusedPKGsCount=$(/usr/libexec/PlistBuddy -c "Print :Unused_Packages" "$outputPlist" | grep '=' | awk '{print$1}' | wc -l | awk '{print$1}')
+	unusedScriptsCount=$(/usr/libexec/PlistBuddy -c "Print :Unused_Scripts" "$outputPlist" | grep '=' | awk '{print$1}' | wc -l | awk '{print$1}')
+	pkgCount=$(expr $PackageCount + $ImagingPkgCount)
 	chmod -R 777 "$output/JSS_Used_Files"
 	echo ""
 	echo ""
@@ -134,9 +134,9 @@ function ScriptCleanup () {
 	OLDIFS=$IFS
 	IFS=$'\n'
 	for scriptID in $(jq '.scripts[] | .id' "$output/JSS_Used_Files/scripts.xml"); do
-		scriptExist=`/usr/libexec/PlistBuddy -c "Print :Scripts" $outputPlist | grep -e "$scriptID" | awk '{print$1}'`
+		scriptExist=$(/usr/libexec/PlistBuddy -c "Print :Scripts" $outputPlist | grep -e "$scriptID" | awk '{print$1}')
 		if [ "$scriptExist" !=  "$scriptID" ]; then
-			scriptFilename=`curl -k -s -u "$username":"$password" "$jssUrl/JSSResource/scripts/id/$scriptID" | grep -e "<name>" | sed -e 's,.*<name>\([^<]*\)</name>.*,\1,g'`
+			scriptFilename=$(curl -k -s -u "$username":"$password" "$jssUrl/JSSResource/scripts/id/$scriptID" | grep -e "<name>" | sed -e 's,.*<name>\([^<]*\)</name>.*,\1,g')
 			wPlist "Unused_Scripts:$scriptID" "$scriptFilename" "$outputPlist"
 		fi
 	done
@@ -149,9 +149,9 @@ function PackagesCleanup () {
 	OLDIFS=$IFS
 	IFS=$'\n'
 	for packageID in $(jq '.packages[] | .id' "$output/JSS_Used_Files/packages.xml"); do
-		PackageExist=`/usr/libexec/PlistBuddy -c "Print :Packages" $outputPlist | grep "$packageID" | awk '{print$1}'`
+		PackageExist=$(/usr/libexec/PlistBuddy -c "Print :Packages" $outputPlist | grep "$packageID" | awk '{print$1}')
 		if [ "$PackageExist" !=  "$packageID" ]; then
-			packageFilename=`curl -k -s -u "$username":"$password" "$jssUrl/JSSResource/packages/id/$packageID" | grep -e "<filename>" | sed -e 's,.*<filename>\([^<]*\)</filename>.*,\1,g'`
+			packageFilename=$(curl -k -s -u "$username":"$password" "$jssUrl/JSSResource/packages/id/$packageID" | grep -e "<filename>" | sed -e 's,.*<filename>\([^<]*\)</filename>.*,\1,g')
 			wPlist "Unused_Packages:$packageID" "$packageFilename" "$outputPlist"
 		fi
 	done
@@ -163,7 +163,7 @@ function wPlist () {
 	Value=$2
 	PlistLocation=$3
 	if [ "$Value" != "" ]; then
-		currentInfo=`/usr/libexec/PlistBuddy -c "Print :$Key" "$PlistLocation"`
+		currentInfo=$(/usr/libexec/PlistBuddy -c "Print :$Key" "$PlistLocation")
 		if [ "$currentInfo" = "" ]; then
 			/usr/libexec/PlistBuddy -c "Add :$Key string $Value" "$PlistLocation"
 		else
@@ -175,7 +175,7 @@ function wPlist () {
 }
 
 ## Script
-#################################################################################################### 
+####################################################################################################
 VerifyVariables
 GetAPIid policies
 GetAPIid computerconfigurations

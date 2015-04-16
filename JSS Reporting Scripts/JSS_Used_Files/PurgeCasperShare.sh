@@ -1,6 +1,6 @@
 #!/bin/bash
 # PurgeCasperShare.sh
-# 
+#
 #
 # Created by andrewws on 02/03/15.
 # Copyright 2015 Genentech. All rights reserved.
@@ -9,7 +9,7 @@
 # set -n	# EVALUATE. Check syntax of the script but dont execute
 
 ## Variables
-#################################################################################################### 
+####################################################################################################
 # Variables used by this script
 CasperShare=''
 output=''
@@ -19,7 +19,7 @@ password=''
 outputPlist=""
 
 ## Functions
-#################################################################################################### 
+####################################################################################################
 function InitiateScript () {
 	CheckIfjq
 	VerifyVariables
@@ -58,8 +58,8 @@ function PurgePackages () {
 	OLDIFS=$IFS
 	IFS=$'\n'
 	for package in $(/usr/libexec/PlistBuddy -c 'Print :Unused_Packages' "$outputPlist" | grep '='); do
-		packageID=`echo $package | cut -d '=' -f1 | awk '{print$1}'`
-		packageName=`echo $package | cut -d '=' -f2 | sed 's/ //'`
+		packageID=$(echo $package | cut -d '=' -f1 | awk '{print$1}')
+		packageName=$(echo $package | cut -d '=' -f2 | sed 's/ //')
 		echo "Removing $packageName from the JSS"
 		#curl -k -s -u "$username":"$password" "$jssUrl/JSSResource/packages/id/$packageID" -X DELETE > /dev/null 2>&1
 		if [ -e "$CasperShare/Packages/$packageName" ]; then
@@ -75,12 +75,12 @@ function PurgeScripts () {
 	OLDIFS=$IFS
 	IFS=$'\n'
 	for script in $(/usr/libexec/PlistBuddy -c 'Print :Unused_Scripts' "$outputPlist" | grep '='); do
-		scriptID=`echo $script | cut -d '=' -f1 | awk '{print$1}'`
-		scriptName=`echo $script | cut -d '=' -f2 | sed 's/ //'`
+		scriptID=$(echo $script | cut -d '=' -f1 | awk '{print$1}')
+		scriptName=$(echo $script | cut -d '=' -f2 | sed 's/ //')
 		echo "Removing $scriptName from the JSS"
 		#curl -k -s -u "$username":"$password" "$jssUrl/JSSResource/scripts/id/$scriptID" -X DELETE > /dev/null 2>&1
 	done
-	IFS=$OLDIFS	
+	IFS=$OLDIFS
 }
 function CheckIfjq () {
 	if [ ! -e /usr/sbin/jq ]; then
@@ -88,8 +88,8 @@ function CheckIfjq () {
 		exit 0
 	fi
 }
-	
+
 ## Script
-#################################################################################################### 
+####################################################################################################
 InitiateScript
 exit 0
