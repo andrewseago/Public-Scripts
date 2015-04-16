@@ -42,6 +42,14 @@ function VerifyVariables () {
 	outputPlist="$output/JSS_Used_Files/results.plist"
 }
 
+function VerifyJQ () {
+	which jq &>/dev/null
+	if [[ $? -ne 0 ]]; then
+		echo "This script requires the jq binary to be installed."
+		exit 1
+	fi
+}
+
 function GetAPIid () {
 	jssAPItable="$1"
 	echo "Getting ID's for $jssAPItable"
@@ -49,7 +57,7 @@ function GetAPIid () {
 	curl -k -s -u "$username":"$password" "$jssUrl/JSSResource/$jssAPItable" | xmllint --format - | grep '<id>' | sed 's/<id>//' | sed 's/<\/id>//' | awk '{print$1}' > "$output/JSS_Used_Files/$jssAPItable/ID_$jssAPItable.xml"
 	if [ ! -f "$output/JSS_Used_Files/$jssAPItable/ID_$jssAPItable.xml" ]; then
 		echo "ERROR $output/JSS_Used_Files/$jssAPItable/ID_$jssAPItable.xml not dowloaded"
-		exit 0
+		exit 1
 	fi
 	idCount=$(wc -l "$output/JSS_Used_Files/$jssAPItable/ID_$jssAPItable.xml" | awk '{print$1}')
 	myCount=0
@@ -176,6 +184,7 @@ function wPlist () {
 
 ## Script
 ####################################################################################################
+VerifyJQ
 VerifyVariables
 GetAPIid policies
 GetAPIid computerconfigurations
@@ -184,3 +193,5 @@ GetScriptFilename
 ScriptCleanup
 PackagesCleanup
 PrintResult
+
+exit 0
