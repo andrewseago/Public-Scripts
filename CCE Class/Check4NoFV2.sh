@@ -13,15 +13,6 @@ api_user="ladmin"
 api_password="jamf1234"
 jssurl="https://jss.seagonet.net:8443"
 ComputersFV2="/tmp/ComputersFV2.txt"
-SiteXML='<?xml version="1.0" encoding="UTF-8"?>
-<computer>
-  <general>
-    <site>
-      <id>14</id>
-      <name>No Site Listed</name>
-    </site>
-  </general>
-</computer>'
 
 ## Functions
 #################################################################################################### 
