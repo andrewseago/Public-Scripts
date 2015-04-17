@@ -3,7 +3,7 @@
 # 
 #
 # Created by andrewws on 04/16/15.
-# set -x	# DEBUG. Display commands and their arguments as they are executed
+set -x	# DEBUG. Display commands and their arguments as they are executed
 # set -v	# VERBOSE. Display shell input lines as they are read.
 # set -n	# EVALUATE. Check syntax of the script but dont execute
 
@@ -43,16 +43,18 @@ function GrabUserInfo () {
 	OLDIFS=$IFS
     IFS=$'\n'
 	for ID in $(cat $ComputersFV2); do
-		email_address=`curl -s -k -u $api_user:$api_password $jssurl/JSSResource/computers/id/$ID/subset/Location  -H "Accept: application/json" | jq .computer.location.email_address`
-		real_name=`curl -s -k -u $api_user:$api_password $jssurl/JSSResource/computers/id/$ID/subset/Location  -H "Accept: application/json" | jq .computer.location.real_name`
-		phone=`curl -s -k -u $api_user:$api_password $jssurl/JSSResource/computers/id/$ID/subset/Location  -H "Accept: application/json" | jq .computer.location.phone`
-		ComputerName=`curl -s -k -u $api_user:$api_password $jssurl/JSSResource/computers/id/$ID  -H "Accept: application/json" | jq .computer.general.name`
-		report_date=`curl -s -k -u $api_user:$api_password $jssurl/JSSResource/computers/id/$ID  -H "Accept: application/json" | jq .computer.general.report_date`
+		curl -s -k -u $api_user:$api_password $jssurl/JSSResource/computers/id/$ID -H "Accept: application/json" > /tmp/$ID
+		email_address=`jq .computer.location.email_address /tmp/$ID`
+		real_name=`jq .computer.location.real_name /tmp/$ID`
+		phone=`jq .computer.location.phone /tmp/$ID`
+		ComputerName=`jq .computer.general.name /tmp/$ID`
+		report_date=`jq .computer.general.report_date /tmp/$ID`
 		echo "real_name: $real_name" > "/tmp/Users_WithoutFV2/$real_name.$ComputerName"
 		echo "phone: $phone" >> "/tmp/Users_WithoutFV2/$real_name.$ComputerName"
 		echo "email_address: $email_address" >> "/tmp/Users_WithoutFV2/$real_name.$ComputerName"
 		echo "ComputerName: $ComputerName" >> "/tmp/Users_WithoutFV2/$real_name.$ComputerName"
 		echo "last_report_date: $report_date" >> "/tmp/Users_WithoutFV2/$real_name.$ComputerName"
+		rm /tmp/$ID
 	done
 	IFS=$OLDIFS
 }
