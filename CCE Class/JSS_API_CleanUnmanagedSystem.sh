@@ -59,13 +59,6 @@ function VerifyJQ () {
 		installer -pkg /var/tmp/jq.pkg -target / 
     fi
 }
-function InstallCocoaDialog () {
-	if [ ! -d "/private/var/gne/gInstall/bin/cocoaDialog.app" ];then 
-		log "Installing cocoaDialog"
-		curl -k -o /var/tmp/cocoaDialog.pkg "$cocoaDialog_url"
-		installer -pkg /var/tmp/cocoaDialog.pkg -target /
-	fi
-}
 
 function CheckEnrolled () {
 	if [ -f /usr/sbin/jamf ]; then
@@ -128,7 +121,7 @@ function GetFilePaths () {
 	ID=$1
 	FilePath=`curl -s -k -u $api_user:$api_password $jssurl/JSSResource/licensedsoftware/id/$ID  -H "Accept: application/json" | jq .licensed_software.software_definitions[].name | sed 's/"//g'`
 	if [ "$FilePath" == "" ]; then
-		echo "$FilePath" >> "$ApplicationsToRemoveFile"
+		echo "/Applications/$FilePath" >> “$ApplicationsToRemoveFile"
 	fi
 }
 function ModifyJSSrecord () {
