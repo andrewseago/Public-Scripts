@@ -1,6 +1,6 @@
 #!/bin/sh
 # JSS_API_CleanUnmanagedSystem.sh
-# 
+#
 #
 # Created by andrewws on 04/16/15.
 # set -x	# DEBUG. Display commands and their arguments as they are executed
@@ -8,7 +8,7 @@
 # set -n	# EVALUATE. Check syntax of the script but dont execute
 
 ## Variables
-#################################################################################################### 
+####################################################################################################
 api_user="ladmin"
 api_password="jamf1234"
 jssurl="https://jss.seagonet.net:8443"
@@ -51,12 +51,12 @@ Managed='<?xml version="1.0" encoding="UTF-8"?>
 statusXml="/tmp/status.xml"
 jq_url="$url/required/jq.pkg"
 ## Functions
-#################################################################################################### 
+####################################################################################################
 function VerifyJQ () {
     which jq &>/dev/null
     if [[ $? -ne 0 ]]; then
 		curl -k -o /var/tmp/jq.pkg "$jq_url"
-		installer -pkg /var/tmp/jq.pkg -target / 
+		installer -pkg /var/tmp/jq.pkg -target /
     fi
 }
 
@@ -88,7 +88,7 @@ function CheckEnrolled () {
 	else
 		echo "$BadminWon" > "$statusXml"
 		ModifyJSSrecord
-	fi			
+	fi
 }
 
 function DeleteStaticFiles () {
@@ -121,7 +121,7 @@ function GetFilePaths () {
 	ID=$1
 	FilePath=`curl -s -k -u $api_user:$api_password $jssurl/JSSResource/licensedsoftware/id/$ID  -H "Accept: application/json" | jq .licensed_software.software_definitions[].name | sed 's/"//g'`
 	if [ "$FilePath" == "" ]; then
-		echo "/Applications/$FilePath" >> “$ApplicationsToRemoveFile"
+		echo "/Applications/$FilePath" >> "$ApplicationsToRemoveFile"
 	fi
 }
 function ModifyJSSrecord () {
@@ -143,7 +143,5 @@ function ScriptWorkflow () {
 
 ## Script
 
-#################################################################################################### 
+####################################################################################################
 ScriptWorkflow
-
-
