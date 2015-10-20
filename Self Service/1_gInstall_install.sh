@@ -1,10 +1,9 @@
 #!/bin/sh
 #	1_gInstall_install.sh
 #
-# Manual URL: https://docs.google.com/a/gene.com/document/d/15Kar7Nc2_Qt5Q1KWpxsL5UNMGHu3aQrabH6zoD7dueg/edit
 #
 # Created by andrewws on 10/15/2012
-# Copyright 2012 Genentech. All rights reserved.
+# Updated by Andrew Seago on 06/24/2013
 # set -x	# DEBUG. Display commands and their arguments as they are executed
 # set -v	# VERBOSE. Display shell input lines as they are read.
 # set -n	# EVALUATE. Check syntax of the script but dont execute
@@ -52,22 +51,16 @@ declare -x startDialog=""
 if [ "$dmgName" = "" ]; then
 	declare -x dmgName="$4"
 fi
-# pathToDMG checks to see where the DMG is located and sets the appropriate path
-if [ -f "/Library/Application Support/JAMF/Waiting Room/$dmgName" ]; then
-	declare -x pathToDMG="/Library/Application Support/JAMF/Waiting Room/"
-else
-	declare -x pathToDMG="/private/var/gne/gInstall/cache/"
-fi
-# fullPathToDMG is the full path to the DMG
-declare -x fullPathToDMG="$pathToDMG$dmgName"
+
+
 # policyName is the dialog title for the policy
 if [ "$policyName" = "" ]; then
 	declare -x policyName="$5"
 fi
-# InstallType examples: 
-#	DMG (dmg file) 
-#	fut (dmg with "Fill user templates") 
-#	feu (dmg with "Fill existing users") 
+# InstallType examples:
+#	DMG (dmg file)
+#	fut (dmg with "Fill user templates")
+#	feu (dmg with "Fill existing users")
 #	feu,fut (dmg with both "Fill existing users" and "Fill user templates")
 #	pkg (dmg with an installable pkg)
 if [ "$installType" = "" ]; then
@@ -77,12 +70,12 @@ fi
 
 # keyPackage is the name of the keyaccess package. MUST FOLLOW NAMING CONVENTION
 # i.e. util_keyAccess_7.0.mpkg
-if [ "$keyDMG" == "" ]; then   
-    if [ "$7" == "" ]; then
-    	keyDMG="NA"
-    else
-    	keyDMG="$7"
-    fi
+if [ "$keyDMG" == "" ]; then
+if [ "$7" == "" ]; then
+	keyDMG="NA"
+else
+	keyDMG="$7"
+fi
 fi
 
 if [ "$startDialog" = "" ]; then
@@ -105,15 +98,19 @@ if [ "$postTrigger" = "" ]; then
 	declare -x postTrigger="${11}"
 fi
 
-
-
+# pathToDMG checks to see where the DMG is located and sets the appropriate path
+declare -x pathToDMG="/Library/Application Support/JAMF/Waiting Room/"
+# fullPathToDMG is the full path to the DMG
+declare -x fullPathToDMG="$pathToDMG$dmgName"
+# Downloading File Path
+declare -x DownloadFullPath="/Library/Application Support/JAMF/Downloads/$dmgName"
 # LOGGING FUNCTION
 log () {
 	echo "---------------------------------------------------------------------------------------" >> $logFile
 	echo $1
 	echo $(date "+%Y-%m-%d %H:%M:%S: ") $1 >> $logFile
 	echo "---------------------------------------------------------------------------------------" >> $logFile
-} 
+}
 
 ## Verify DMG package
 function verify_DMG () {
@@ -121,9 +118,10 @@ function verify_DMG () {
 	mkfifo /tmp/hpipe
 	$CocoaDialog progressbar --icon-file "$ActivityMonitorIcon" --float --title "$policyName" --text "Verifying Download......." --icon-height "92" --icon-width "92" --width "500" --height "132" --indeterminate < /tmp/hpipe &
 	exec 3<> /tmp/hpipe
+	sleep 2
 	## Verify DMG package
-	dmgVerify=`/usr/bin/hdiutil verify "$fullPathToDMG"`
-	if [ $? == 0 ]; then
+	/usr/bin/hdiutil verify "$fullPathToDMG"
+	if [[ "$?" == 0 ]]; then
 		log "Verify of $fullPathToDMG Complete"
 		exec 3>&-
 		wait
@@ -145,8 +143,8 @@ function verify_DMG () {
 
 function cleanup () {
 		log "Removing $dmgName"
-		/bin/rm "$fullPathToDMG" >> $logFile
-		if [ "$postTrigger" != "" ] && [ "$installStatus" = "Complete" ]; then
+		#/bin/rm "$fullPathToDMG" >> $logFile
+		if [ "$postTrigger" != "" ] && [ "$installStatus" = "Complete" ] && [ "$downloadTrigger" = "" ]; then
 			log "Running postTrigger Trigger $postTrigger"
 			/usr/sbin/jamf policy -trigger "$postTrigger" >> $logFile
 			if [ $? == 0 ]; then
@@ -164,7 +162,7 @@ function cleanup () {
 			log "Exiting Install"
 			exit 1
 		fi
-		
+
 
 }
 
@@ -178,7 +176,7 @@ function installDMG () {
 		log "$installType Install"
 		/usr/sbin/jamf install -package "$dmgName" -path "$pathToDMG"  -target / -progress -verbose >> $logFile
 	fi
-	
+
 	####	fut (dmg with "Fill user templates") Installer
 	if [ "$installType" == "fut" ]; then
 		log "$installType Install"
@@ -187,7 +185,7 @@ function installDMG () {
 	####	feu (dmg with "Fill existing users") installer
 	if [ "$installType" == "feu" ]; then
 		log "$installType Install"
-		/usr/sbin/jamf install -package "$dmgName" -path "$pathToDMG"  -target / -progress -verbose -feu >> $logFile
+		/usr/sbin/jamf install -package "$dmgName" -path "$pathToDMG" -target / -progress -verbose -feu >> $logFile
 	fi
 	####	feu,fut (dmg with both "Fill existing users" and "Fill user templates") installer
 	if [ "$installType" == "feu,fut" ]; then
@@ -223,7 +221,11 @@ function install_pkg () {
 	# Mount the DMG
 	log "$installType Install"
 	log "Mounting $dmgName..."
-	rm "$mountPointDMG"
+	if [ -e "$mountPointDMG" ]; then
+		rm "$mountPointDMG"
+	else
+		touch "$mountPointDMG"
+	fi
 	/usr/bin/hdiutil mount -nobrowse -noautoopen -noverify -verbose "$fullPathToDMG" > "$mountPointDMG"
 	if [ $? == 0 ]; then
 		log "$dmgName mounted successfully"
@@ -248,23 +250,23 @@ function install_pkg () {
 	wait
 	rm -f /tmp/hpipe
 	DIR="$mountVolume/"
- 
+
 	# failsafe - fall back to current directory
 	[ "$DIR" == "" ] && DIR="."
- 
-	# save and change IFS 
+
+	# save and change IFS
 	OLDIFS=$IFS
 	IFS=$'\n'
- 
+
 	# read all file name into an array
 	fileArray=($(ls -1 $DIR | grep "pkg"))
- 
-	# restore it 
+
+	# restore it
 	IFS=$OLDIFS
- 
+
 	# get length of an array
 	tLen=${#fileArray[@]}
- 
+
 	for (( i=0; i<${tLen}; i++ ));
 		do
 		echo "${fileArray[$i]}"
@@ -287,7 +289,7 @@ function install_pkg () {
 			else
 				cleanup
 			fi
-		fi	
+		fi
 	done
 
 	# Unmount DMG
@@ -297,6 +299,24 @@ function install_pkg () {
 	fi
 }
 
+function downloadProgress () {
+	( sourceSize="$postTrigger"
+			/usr/sbin/jamf policy -trigger "$downloadTrigger" -verbose >> "$logFile" &
+			while [[ `ps -ae | grep "$downloadTrigger" | grep -v grep ` != "" ]] && [[ $precent -ne 100 ]]
+			do
+			   downloadProgress=`du -k  "$DownloadFullPath" | awk '{print$1}'`
+			if [ "$downloadProgress" = "" ] || [ "$downloadProgress" = "0" ]; then
+				  	echo "Download Starting... "
+			else
+			  	precent=`echo "$downloadProgress $sourceSize" | awk '{print$1/$2*100}' | cut -d "." -f1`
+			  	echo "$precent Download in Progress $precent%"
+			fi
+			sleep 3
+			done
+
+	)|$CocoaDialog progressbar --icon-file "/var/gne/gInstall/icons/globeDownload.icns" -- debug --float --title "$Title" --text "Download in progress......." --icon-height "92" --icon-width "92" --width "500" --height "132" >> "$logFile"
+}
+
 ### Script
 
 if [ ! -d "/Library/Logs/gInstall" ]; then
@@ -304,13 +324,17 @@ if [ ! -d "/Library/Logs/gInstall" ]; then
 	chmod -R 777 /Library/Logs/gInstall
 fi
 
+if [ ! -d "/private/var/gne/gInstall/cache/" ]; then
+	mkdir /private/var/gne/gInstall/cache/
+	chmod -R 777 /private/var/gne/gInstall/cache/
+fi
 
 
 echo "#######################################################################################" >> $logFile
 echo "Starting $policyName" >> $logFile
 echo "#######################################################################################" >> $logFile
 
-
+log "fullPathToDMG $fullPathToDMG"
 
 if [ "$startDialog" != "NA" ]; then
 	dialog=`$CocoaDialog msgbox --no-newline --title "$policyName" --text "Welcome to the $policyName" --informative-text "$startDialog" --button1 "Cancel" --button2 "Proceed" --icon-file "$gInstallIcon" --float --string-output `
@@ -337,40 +361,8 @@ if [ "$preInstallTrigger" != "" ]; then
 fi
 
 if [ "$downloadTrigger" != "" ]; then
-{
 	log "Running Download Trigger $downloadTrigger"
-	/usr/sbin/jamf policy -trigger "$downloadTrigger" >> $logFile
-	if [ $? == 0 ]; then
-		log "Download Complete"
-	else
-		installStatus="FAIL"
-		log "Download Failed"
-		downloadStatus="FAIL"
-	fi
-}|$CocoaDialog progressbar --icon-file "$globeDownloadIcon" --float --title "$policyName" --text "Downloading Installer" --icon-height "92" --icon-width "92" --width "500" --height "132" --indeterminate
-	if [ "$downloadStatus" = "FAIL" ]; then
-		dialog=`$CocoaDialog msgbox --no-newline --title "$policyName" --text "Download Failed" --informative-text "Please Quit gInstall and verify you have a stable connection to the internet before attempting to install again" --button1 "Exit" --icon-file "$redXIcon" --float --string-output`
-		if [ "$dialog" = "Exit" ]; then
-			cleanup
-		else
-			cleanup
-		fi
-	fi
-fi
-
-
-
-if [ ! -f "$fullPathToDMG" ]; then
-	log "$fullPathToDMG Does not exist on the system"
-	installStatus="FAIL"
-	dialog=`$CocoaDialog msgbox --no-newline --title "$policyName" --text "Download Failed" --informative-text "Please Quit gInstall and verify you have a stable connection to the internet before attempting to install again" --button1 "Exit" --icon-file "$redXIcon" --float --string-output`
-	if [ "$dialog" = "Exit" ]; then
-		cleanup
-	else
-		cleanup
-	fi
-else
-	log "Found $fullPathToDMG"
+	downloadProgress
 fi
 
 verify_DMG

@@ -1,53 +1,33 @@
 #!/bin/sh
 # Set_SUS.sh
-# 
-# Description: This script uses the assigned Software Update Servers in Casper to correctly set the systems full sucatalog url 
 #
-# Created by andrewws on 06/13/13.
-
-# set -x	# DEBUG. Display commands and their arguments as they are executed
+#	Checks and Applies the Computers SUS Server that is assigned to the systems current subnet
+# Created by Andrew Seago on 11/13/13.
+# Updated by Andrew Seago on 10/19/2015
+#
+# set -x  # DEBUG. Display commands and their arguments as they are executed
 # set -v	# VERBOSE. Display shell input lines as they are read.
 # set -n	# EVALUATE. Check syntax of the script but dont execute
 
 ## Variables
 ####################################################################################################
-logFile="/private/var/log/setSUS.log"
-logname="/private/var/tmp/.susLog"
+
 date=`date "+%Y-%m-%d"`
-DefaultSUSserver="ENTER DEFAULT SUS URL AND PORT HERE"
+DefaultSUSserver="http://sus.acme.com"
 jamf=/usr/sbin/jamf
-OS=`/usr/bin/sw_vers -productVersion | /usr/bin/colrm 5`
-jssIDlog="/private/var/tmp/.jssid"
-jssID=`cat "$jssIDlog"`
-# API user that has minimal API read only access
-apiUsername="ENTER USERNAME HERE"
-apiPassword="ENTER PASSWORD HERE"
+OS=`sw_vers -buildVersion | /usr/bin/colrm 3`
+apiUsername=""
+apiPassword=""
 susURL=""
 jssAddress=`defaults read /Library/Preferences/com.jamfsoftware.jamf jss_url`
 CatalogURL=""
 SUSserver=""
-
+SystemUDID=`system_profiler SPHardwareDataType | grep 'Hardware UUID:' | awk '{print$3}'`
+objectExists=`curl -k -s -u "$jssUSER_Destination":"$jssPASSWORD_Destination" "$jssURL_Destination/$jss2jssAPItable/udid/$SystemUDID"`
 ## Functions
 ####################################################################################################
-## log function
-log () {
-	echo $1
-	echo $(date "+%Y-%m-%d %H:%M:%S: ") $1 >> $logFile	
-}
-
-## This run's reo
-function jamfRecon () {
-# Run Recon and update userInfo if possible
-	if [ "$UserName" = "" ]; then
-		$jamf recon >> "$logname"
-	else
-		$jamf recon -endUsername "$UserName" -email "$Email" -room "$Site" -phone "$PhoneNumber" >> "$logname"
-	fi
-}
-
-## This checks to see if the JSS is reachable. If not it terminates the script
 function jssAvalible () {
-	JSS1avalible=$(curl -ks -I "$jssAddress"apiFrontPage.rest 2>|/dev/null | awk '/^HTTP/ { print $2 }' | sed -e 's/[[:cntrl:]]//')
+	JSS1avalible=$(curl -ks -I "$jssAddress"/selfservice2/ 2>|/dev/null | awk '/^HTTP/ { print $2 }' | sed -e 's/[[:cntrl:]]//')
 	if [ "$JSS1avalible" = "200" ]; then
 		jssAddress="$jssAddress"
 	else
@@ -55,99 +35,101 @@ function jssAvalible () {
 	fi
 }
 
-## Attempts to find the correct SUS server leveraging the Casper API
-function findSUS () {
-	susID=`curl -ks -u "$apiUsername":"$apiPassword" "$jssAddress"JSSResource/computers/id/$jssID/subset/General -X GET | sed -e 's,.*<sus>\([^<]*\)</sus>.*,\1,g' | awk '{print$1}'`
-	susURL=`curl -ks -u "$apiUsername":"$apiPassword" "$jssAddress"JSSResource/softwareupdateservers/name/"$susID" -X GET | sed -e 's,.*<ip_address>\([^<]*\)</ip_address>.*,\1,g' | awk '{print$1}'`
-	susPort=`curl -ks -u "$apiUsername":"$apiPassword" "$jssAddress"JSSResource/softwareupdateservers/name/"$susID" -X GET | sed -e 's,.*<port>\([^<]*\)</port>.*,\1,g' | awk '{print$1}'`
-}
 
-## Sets the variable for the correct sucatalog and branch
+
 function getCatalogURL () {
-	if [[ "$OS" = "10.6" ]]; then
+	if [ "$OS" == "10" ]; then
 		CatalogURL="$susServer/content/catalogs/others/index-leopard-snowleopard.merged-1_prod.sucatalog"
 	fi
-	if [[ "$OS" = "10.5" ]]; then
-		CatalogURL="$susServer/content/catalogs/others/index-leopard.merged-1_prod.sucatalog"
-	fi
-	if [[ "$OS" = "10.7" ]]; then
+	if [ "$OS" == "11" ]; then
 		CatalogURL="$susServer/content/catalogs/others/index-lion-snowleopard-leopard.merged-1_prod.sucatalog"
 	fi
-	if [[ "$OS" = "10.8" ]]; then
+	if [ "$OS" == "12" ]; then
 		CatalogURL="$susServer/content/catalogs/others/index-mountainlion-lion-snowleopard-leopard.merged-1_prod.sucatalog"
 	fi
+	if [ "$OS" == "13" ]; then
+		CatalogURL="$susServer/content/catalogs/others/index-10.9-mountainlion-lion-snowleopard-leopard.merged-1_prod.sucatalog"
+	fi
+	if [ "$OS" == "14" ]; then
+		CatalogURL="$susServer/content/catalogs/others/index-10.10-10.9-mountainlion-lion-snowleopard-leopard.merged-1_prod.sucatalog"
+	fi
+	if [ "$OS" == "15" ]; then
+		CatalogURL="$susServer/content/catalogs/others/index-10.11-10.10-10.9-mountainlion-lion-snowleopard-leopard.merged-1_prod.sucatalog"
+	fi
 }
 
-## Sets the variable for the if all else fails default sucatalog and branch
 function GetDefaultSusCatalogURL () {
-	if [[ "$OS" = "10.6" ]]; then
+	if [ "$OS" == "10" ]; then
 		DefaultCatalogURL="$DefaultSUSserver/content/catalogs/others/index-leopard-snowleopard.merged-1_prod.sucatalog"
 	fi
-	if [[ "$OS" = "10.5" ]]; then
-		DefaultCatalogURL="$DefaultSUSserver/content/catalogs/others/index-leopard.merged-1_prod.sucatalog"
-	fi
-	if [[ "$OS" = "10.7" ]]; then
+	if [ "$OS" == "11" ]; then
 		DefaultCatalogURL="$DefaultSUSserver/content/catalogs/others/index-lion-snowleopard-leopard.merged-1_prod.sucatalog"
 	fi
-	if [[ "$OS" = "10.8" ]]; then
+	if [ "$OS" == "12" ]; then
 		DefaultCatalogURL="$DefaultSUSserver/content/catalogs/others/index-mountainlion-lion-snowleopard-leopard.merged-1_prod.sucatalog"
+	fi
+	if [ "$OS" == "13" ]; then
+		DefaultCatalogURL="$DefaultSUSserver/content/catalogs/others/index-10.9-mountainlion-lion-snowleopard-leopard.merged-1_prod.sucatalog"
+	fi
+	if [ "$OS" == "14" ]; then
+		DefaultCatalogURL="$DefaultSUSserver/content/catalogs/others/index-10.10-10.9-mountainlion-lion-snowleopard-leopard.merged-1_prod.sucatalog"
+	fi
+	if [ "$OS" == "15" ]; then
+		DefaultCatalogURL="$DefaultSUSserver/content/catalogs/others/index-10.11-10.10-10.9-mountainlion-lion-snowleopard-leopard.merged-1_prod.sucatalog"
 	fi
 }
 
+function findSUS () {
+	susID=`curl -ks -u "$apiUsername":"$apiPassword" "$jssAddress"JSSResource/computers/udid/$SystemUDID/subset/General -X GET | sed -e 's,.*<sus>\([^<]*\)</sus>.*,\1,g' | awk '{print$1}'`
+	susURL=`curl -ks -u "$apiUsername":"$apiPassword" "$jssAddress"JSSResource/softwareupdateservers/name/"$susID" -X GET | sed -e 's,.*<ip_address>\([^<]*\)</ip_address>.*,\1,g' | awk '{print$1}'`
+	susURLExist=`echo "$susURL" | grep '<html>'`
+	if [ "$susURLExist" != "" ]; then
+		susURL=""
+	fi
+	susPort=`curl -ks -u "$apiUsername":"$apiPassword" "$jssAddress"JSSResource/softwareupdateservers/name/"$susID" -X GET | sed -e 's,.*<port>\([^<]*\)</port>.*,\1,g' | awk '{print$1}'`
+	if [[ "$susPort" == 80 ]]; then
+		susPort=""
+	else
+		susPort=":$susPort"
+	fi
+}
 
+function SetSUS () {
+	if [ "$susURL" = "" ]; then
+		defaultSUSavalible=$(curl -I "$DefaultSUSserver/content/catalogs/others/index-mountainlion-lion-snowleopard-leopard.merged-1_prod.sucatalog" 2>|/dev/null | awk '/^Content-Type:/ { print $2 }' | sed -e 's/[[:cntrl:]]//')
+		if [ "$defaultSUSavalible" != "text/xml" ]; then
+			exit 0
+		else
+			declare -x susServer="$DefaultSUSserver"
+			GetDefaultSusCatalogURL
+			`defaults write /Library/Preferences/com.apple.SoftwareUpdate CatalogURL $DefaultCatalogURL`
+			`defaults write /var/root/Library/Preferences/com.apple.SoftwareUpdate CatalogURL $DefaultCatalogURL`
+			if [[ "$OS" == "10.9" ]] || [[ "$OS" == "10.1" ]]; then
+				killall softwareupdated
+else
+killall softwareupdate
+			fi
+			exit 0
+		fi
+	else
+		declare -x susServer="http://$susURL$susPort"
+		getCatalogURL
+		`defaults write /Library/Preferences/com.apple.SoftwareUpdate CatalogURL "$CatalogURL"`
+		`defaults write /var/root/Library/Preferences/com.apple.SoftwareUpdate CatalogURL "$CatalogURL"`
+		if [ "$OS" == "13" ] || [ "$OS" == "14" ] || [ "$OS" == "15" ]; then
+			killall softwareupdated
+else
+killall softwareupdate
+		fi
+		exit 0
+	fi
+}
 
 ## Script
 ####################################################################################################
-rm -f $jssIDlog
-## Get JSSID and run Recon
-if [ -f "$jssIDlog" ]; then
-	if [ "$jssID" = "" ] || [ "$jssID" = "N/A" ]; then
-		echo "$date" > "$logname"
-		jamfRecon
-		grep -m1 "computer" $logname | awk -F"<computer_id>" '{ print $2 }' | awk -F"</computer_id>" '{ print $1 }' > "$jssIDlog"
-		jssID=`cat "$jssIDlog"`
-	fi
-else
-	if [ -d "/var/gne" ]; then
-		echo "$date" > "$logname"
-		jamfRecon
-		grep -m1 "computer" $logname | awk -F"<computer_id>" '{ print $2 }' | awk -F"</computer_id>" '{ print $1 }' > "$jssIDlog"
-		jssID=`cat "$jssIDlog"`
-	else
-		mkdir "/var/gne"
-		echo "$date" > "$logname"
-		jamfRecon
-		grep -m1 "computer" $logname | awk -F"<computer_id>" '{ print $2 }' | awk -F"</computer_id>" '{ print $1 }' > "$jssIDlog"
-		jssID=`cat "$jssIDlog"`
-	fi
-fi
+## Get JSSID
 jssAvalible
 findSUS
+SetSUS
 
-
-
-if [ "$susURL" = "<?xml" ]; then
-	log "SUS not found in JSS"
-	log "Using $DefaultSUSserver"
-	defaultSUSavalible=$(curl -I "$DefaultSUSserver" 2>|/dev/null | awk '/^Content-Type:/ { print $2 }' | sed -e 's/[[:cntrl:]]//')
-	if [ "$defaultSUSavalible" != "text/plain" ]; then
-		log "Unable to contact $DefaultSUSserver"	
-		exit 0
-	else
-		log "Contacted $DefaultSUSserver"
-		declare -x susServer="$DefaultSUSserver"
-		GetDefaultSusCatalogURL
-		`defaults write /Library/Preferences/com.apple.SoftwareUpdate CatalogURL $DefaultCatalogURL`
-		`defaults write /var/root/Library/Preferences/com.apple.SoftwareUpdate CatalogURL $DefaultCatalogURL`
-		exit 0
-	fi
-else
-	declare -x susServer="http://$susURL:$susPort"
-	getCatalogURL
-	`defaults write /Library/Preferences/com.apple.SoftwareUpdate CatalogURL $CatalogURL`
-	`defaults write /var/root/Library/Preferences/com.apple.SoftwareUpdate CatalogURL $CatalogURL`
-	exit 0
-fi
-
-exit 0	
-
+exit 0		## Success
