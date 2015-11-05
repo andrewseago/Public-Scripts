@@ -15,6 +15,7 @@
 process_search_string="JDS_Policy.sh"
 self_pid=$$
 smbRWuser='' # User Casper Admin uses when connecting via SMB
+smbSharePath='' # Filepath to root CasperShare
 apacheUser='' # User Apache is running as
 apacheGroup='' # Group Apache is running as
 rootPath="/var/JDS_Policy"
@@ -49,7 +50,7 @@ Check_Process_Running () {
 CheckUpload() {
   smbRWuserActive=`smbstatus -U | grep "$smbRWuser"`
   if [ "$smbRWuserActive" != '' ]; then
-    FilesInUse=`smbstatus -L | grep 'RDWR'`
+    FilesInUse=`smbstatus -U "$smbRWuser" | grep 'RDONLY\|RDWR' | grep -vw "$smbSharePath   ."`
      if [ "$FilesInUse" != '' ]; then
        log "Files are being uploaded or used by $smbRWuser"
        log "Sleeping for 15 min"
