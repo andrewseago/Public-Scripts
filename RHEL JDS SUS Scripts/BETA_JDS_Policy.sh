@@ -50,7 +50,7 @@ Check_Process_Running () {
 CheckUpload() {
   smbRWuserActive=`smbstatus -U | grep "$smbRWuser"`
   if [ "$smbRWuserActive" != '' ]; then
-    FilesInUse=`smbstatus -U "$smbRWuser" | grep 'RDONLY\|RDWR' | grep -vw "$smbSharePath   ."`
+    FilesInUse=`smbstatus --user="$smbRWuser" | grep 'RDONLY\|RDWR' | grep -vw "$smbSharePath   ."`
      if [ "$FilesInUse" != '' ]; then
        log "Files are being uploaded or used by $smbRWuser"
        log "Sleeping for 15 min"
@@ -98,20 +98,20 @@ inventory(){
         rm -Rf "$fullPathTofile.*"
         sed -i -e  "s/#${file}#${PreviousModTime}/#${file}#${ModTime}/" "$rootPath/CasperShareInventory"
         log "Starting jamfds Inventory"
-        jamfds inventory
+        CheckUpload
         log "jamfds Inventory has completed"
       fi
     else
 			log "Creating CasperShareInventory"
       log "Starting jamfds Inventory"
-      jamfds inventory
+      CheckUpload
       log "jamfds Inventory has completed"
       echo "#${file}#${ModTime}" >> "$rootPath/CasperShareInventory"
     fi
   done
   IFS=$OLDIFS
 	log "Starting jamfds Inventory"
-	jamfds inventory
+	CheckUpload
 	log "jamfds Inventory has completed"
 	log "Waiting 2 minutes for JSS Cluster"
 	sleep 120
