@@ -1,5 +1,5 @@
 #!/bin/sh
-#	CP - Backup Percent Complete
+#	CP - Computer GUID
 #
 # Updated 03/28/2016
 # Updated By Andrew Seago

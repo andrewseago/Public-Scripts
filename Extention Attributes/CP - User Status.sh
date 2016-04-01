@@ -11,11 +11,7 @@
 ####################################################################################################
 CP_AdminUsername="CP_AdminUsername"
 CP_AdminPassword="CP_AdminPassword"
-if [ -f "/Library/Application Support/CrashPlan/conf/my.service.xml" ]; then
-	CP_URL=`grep "websiteHost" /Library/Application\ Support/CrashPlan/conf/my.service.xml | sed 's/<websiteHost>//' | sed 's@</websiteHost>@@' | awk '{print$1}'`
-else
-	CP_URL=""
-fi
+CP_URL="https://url.com:4285"
 if [ -f /Library/Application\ Support/CrashPlan/.identity ]; then
 	cru=$(grep username /Library/Application\ Support/CrashPlan/.identity | sed s/username=// | sed 's/\\//g')
 	if [ "$cru" == "" ]; then

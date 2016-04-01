@@ -1,5 +1,5 @@
 #!/bin/sh
-#	CP - OrgName
+#	CP - Username
 #
 # Updated Oct 19th 2015
 # Updated By Andrew Seago
@@ -11,12 +11,12 @@
 ## Script
 ####################################################################################################
 if [ -f /Library/Application\ Support/CrashPlan/.identity ]; then
-cru=$(grep username /Library/Application\ Support/CrashPlan/.identity | sed s/username=// | sed 's/\\//g')
-if [ "$cru" == '' ]; then
-	echo "<result>No Username</result>"
-else
-	echo "<result>$cru</result>"
-fi
+	cru=$(grep username /Library/Application\ Support/CrashPlan/.identity | sed s/username=// | sed 's/\\//g')
+	if [ "$cru" == '' ]; then
+		echo "<result>No Username</result>"
+	else
+		echo "<result>$cru</result>"
+	fi
 else
 	echo "<result>Not installed</result>"
 fi
