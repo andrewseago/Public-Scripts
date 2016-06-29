@@ -1,10 +1,10 @@
 # CocoaDialogFunctions.config
 #
 #	This script should be sourced into any other scripts needing CocoaDialogFunctions
-#	
+#
 # Created by andrewws on 06/30/14.
 # Updated by andrewws on 10/20/2015
-# Copyright 2014 Genentech. All rights reserved.
+
 
 ## Variables
 ####################################################################################################

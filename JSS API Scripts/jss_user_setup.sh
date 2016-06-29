@@ -1,6 +1,6 @@
 #!/bin/sh
 # jss_user_setup.sh
-# 
+#
 #
 # Created by andrewws on 06/11/12.
 
@@ -9,7 +9,7 @@
 # set -n	# EVALUATE. Check syntax of the script but dont execute
 
 ## Variables
-#################################################################################################### 
+####################################################################################################
 # Variables used for logging
 logFile="/private/var/log/jss_user_setup.log"
 # Variables used by this script
@@ -17,7 +17,7 @@ jamf="/usr/sbin/jamf"
 JSSurl=`defaults read /Library/Preferences/com.jamfsoftware.jamf "jss_url"`
 checkJSSid=`syslog -C | grep -m1 "computer" | awk -F"<computer_id>" '{ print $2 }' | awk -F"</computer_id>" '{ print $1 }'`
 MACaddress=`ifconfig | grep -m 1 ether | awk '{print $2}' | sed s/:/./g`
-FirstBootRan="/Library/Genentech/.firstbootran"
+FirstBootRan="/Library/CompanyDirectory/.firstbootran"
 privs="-DeleteFiles -ControlObserve -TextMessages -OpenQuitApps -GenerateReports -RestartShutDown -SendFiles -ChangeSettings"
 # Variables used by Casper
 apiUser="apiUser"
@@ -35,11 +35,11 @@ techUserExists=`/usr/bin/dscl localhost -read /Local/Default/Users/"$techUser" 2
 
 
 ## Functions
-#################################################################################################### 
+####################################################################################################
 # log function
 log () {
 	echo $1
-	echo $(date "+%Y-%m-%d %H:%M:%S: ") $1 >> $logFile	
+	echo $(date "+%Y-%m-%d %H:%M:%S: ") $1 >> $logFile
 }
 
 # Reset Root and techUser Passwords
@@ -90,7 +90,7 @@ function managmentSSH_ARD () {
 
 
 ## Script Logic
-#################################################################################################### 
+####################################################################################################
 
 # Is the JSS avalible
 jssAvalible
@@ -105,7 +105,7 @@ fi
 
 
 ## Script
-#################################################################################################### 
+####################################################################################################
 # Verify tech user Exist
 
 if [ "$techUserExists" == "/bin/bash" ]; then
@@ -113,7 +113,3 @@ if [ "$techUserExists" == "/bin/bash" ]; then
 else
 	createUsers
 fi
-	
-	
-
-

@@ -1,15 +1,15 @@
 #!/bin/sh
 # newscript07.03.12 14:42.sh
-# 
+#
 #
 # Created by andrewws on 07/03/12.
-# Copyright 2012 Genentech. All rights reserved.
+
 # set -x	# DEBUG. Display commands and their arguments as they are executed
 # set -v	# VERBOSE. Display shell input lines as they are read.
 # set -n	# EVALUATE. Check syntax of the script but dont execute
 
 ## Variables
-#################################################################################################### 
+####################################################################################################
 # Variables used for logging
 logFile=/private/var/tmp/cocoaDialog.log
 
@@ -21,11 +21,11 @@ CocoaDialog="/Applications/CocoaDialog.app/Contents/MacOS/CocoaDialog"
 
 
 ## Functions
-#################################################################################################### 
+####################################################################################################
 # Function 1
 
 ## Script
-#################################################################################################### 
+####################################################################################################
 # Script Action 1
 
 $CocoaDialog standard-inputbox --title "Input Box" --informative-text "Please Enter Something:" > $logFile

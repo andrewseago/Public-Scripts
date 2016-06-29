@@ -3,7 +3,7 @@
 #
 #
 # Created by andrewws on 02/03/15.
-# Copyright 2015 Genentech. All rights reserved.
+
 # set -x    # DEBUG. Display commands and their arguments as they are executed
 # set -v    # VERBOSE. Display shell input lines as they are read.
 # set -n    # EVALUATE. Check syntax of the script but dont execute
