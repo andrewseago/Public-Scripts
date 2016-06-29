@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<computer>
+  <jssid/>
+  <jssUDID>Insert Here</jssUDID>
+  <jssMAC>Insert Here</jssMAC>
+  <jssURL>Insert Here</jssURL>
+  <jssSerial>Insert Here</jssSerial>
+  <jssName>Insert Here</jssName>
+  <jssUser>Insert Here</jssUser>
+  <jssUserPass>Insert Here</jssUserPass>
+  <gitBranch>Insert Here</gitBranch>
+</computer>

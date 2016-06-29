@@ -1,0 +1,342 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<computer>
+  <general>
+    <name/>
+    <mac_address/>
+    <alt_mac_address/>
+    <ip_address/>
+    <serial_number/>
+    <udid/>
+    <jamf_version>9.82</jamf_version>
+    <platform>Mac</platform>
+    <barcode_1/>
+    <barcode_2/>
+    <asset_tag/>
+    <remote_management>
+      <managed>true</managed>
+      <management_username>caspermanage</management_username>
+      <management_password>e3b0c44298f</management_password>
+    </remote_management>
+    <mdm_capable>true</mdm_capable>
+    <mdm_capable_users/>
+    <report_date>2016-04-13 17:03:12</report_date>
+    <report_date_epoch>1460592192722</report_date_epoch>
+    <report_date_utc>2016-04-13T17:03:12.722-0700</report_date_utc>
+    <last_contact_time/>
+    <last_contact_time_epoch>0</last_contact_time_epoch>
+    <last_contact_time_utc/>
+    <initial_entry_date>2016-04-13</initial_entry_date>
+    <initial_entry_date_epoch>1460592192631</initial_entry_date_epoch>
+    <initial_entry_date_utc>2016-04-13T17:03:12.631-0700</initial_entry_date_utc>
+    <last_cloud_backup_date_epoch>0</last_cloud_backup_date_epoch>
+    <last_cloud_backup_date_utc/>
+    <distribution_point/>
+    <sus/>
+    <netboot_server/>
+    <site>
+      <id>-1</id>
+      <name>None</name>
+    </site>
+    <itunes_store_account_is_active>false</itunes_store_account_is_active>
+  </general>
+  <location>
+    <username/>
+    <real_name/>
+    <email_address/>
+    <position/>
+    <phone/>
+    <department/>
+    <building/>
+    <room/>
+  </location>
+  <purchasing>
+    <is_purchased>true</is_purchased>
+    <is_leased>false</is_leased>
+    <po_number/>
+    <vendor/>
+    <applecare_id/>
+    <purchase_price/>
+    <purchasing_account/>
+    <po_date/>
+    <po_date_epoch>0</po_date_epoch>
+    <po_date_utc/>
+    <warranty_expires/>
+    <warranty_expires_epoch>0</warranty_expires_epoch>
+    <warranty_expires_utc/>
+    <lease_expires/>
+    <lease_expires_epoch>0</lease_expires_epoch>
+    <lease_expires_utc/>
+    <life_expectancy>0</life_expectancy>
+    <purchasing_contact/>
+    <os_applecare_id/>
+    <os_maintenance_expires/>
+    <attachments/>
+  </purchasing>
+  <peripherals>
+    <size>0</size>
+  </peripherals>
+  <hardware>
+    <make/>
+    <model/>
+    <model_identifier/>
+    <os_name/>
+    <os_version/>
+    <os_build/>
+    <active_directory_status/>
+    <service_pack/>
+    <processor_type/>
+    <processor_architecture/>
+    <processor_speed>-1</processor_speed>
+    <processor_speed_mhz>-1</processor_speed_mhz>
+    <number_processors>-1</number_processors>
+    <total_ram>-1</total_ram>
+    <total_ram_mb>-1</total_ram_mb>
+    <boot_rom/>
+    <bus_speed>-1</bus_speed>
+    <bus_speed_mhz>-1</bus_speed_mhz>
+    <battery_capacity>0</battery_capacity>
+    <cache_size>0</cache_size>
+    <cache_size_kb>0</cache_size_kb>
+    <available_ram_slots>0</available_ram_slots>
+    <optical_drive/>
+    <nic_speed/>
+    <smc_version/>
+    <storage/>
+    <mapped_printers/>
+  </hardware>
+  <software>
+    <unix_executables/>
+    <licensed_software/>
+    <installed_by_casper/>
+    <installed_by_installer_swu/>
+    <cached_by_casper/>
+    <available_software_updates/>
+    <available_updates/>
+    <running_services/>
+    <applications>
+      <size>0</size>
+    </applications>
+    <fonts>
+      <size>0</size>
+    </fonts>
+    <plugins>
+      <size>0</size>
+    </plugins>
+  </software>
+  <extension_attributes>
+    <extension_attribute>
+      <id>15</id>
+      <name>CasperShare - Package Count</name>
+      <type>String</type>
+      <value/>
+    </extension_attribute>
+    <extension_attribute>
+      <id>20</id>
+      <name>JDS Site</name>
+      <type>String</type>
+      <value/>
+    </extension_attribute>
+    <extension_attribute>
+      <id>31</id>
+      <name>jdsSync - ExitReason</name>
+      <type>String</type>
+      <value/>
+    </extension_attribute>
+    <extension_attribute>
+      <id>32</id>
+      <name>jdsSync - ExitStatus</name>
+      <type>String</type>
+      <value/>
+    </extension_attribute>
+    <extension_attribute>
+      <id>30</id>
+      <name>jdsSync - KBytesPerSecond</name>
+      <type>Number</type>
+      <value/>
+    </extension_attribute>
+    <extension_attribute>
+      <id>28</id>
+      <name>jdsSync - MaxFilesToDelete</name>
+      <type>Number</type>
+      <value/>
+    </extension_attribute>
+    <extension_attribute>
+      <id>33</id>
+      <name>jdsSync - NumberFilesDeleted</name>
+      <type>String</type>
+      <value/>
+    </extension_attribute>
+    <extension_attribute>
+      <id>34</id>
+      <name>jdsSync - NumberFilesTransfered</name>
+      <type>String</type>
+      <value/>
+    </extension_attribute>
+    <extension_attribute>
+      <id>35</id>
+      <name>jdsSync - SizeFilesTransfered</name>
+      <type>String</type>
+      <value/>
+    </extension_attribute>
+    <extension_attribute>
+      <id>23</id>
+      <name>jdsSync - SourceHostname</name>
+      <type>String</type>
+      <value/>
+    </extension_attribute>
+    <extension_attribute>
+      <id>37</id>
+      <name>jdsSync - TotalRunTime</name>
+      <type>String</type>
+      <value/>
+    </extension_attribute>
+    <extension_attribute>
+      <id>36</id>
+      <name>jdsSync - TransferSpeed</name>
+      <type>String</type>
+      <value/>
+    </extension_attribute>
+    <extension_attribute>
+      <id>19</id>
+      <name>Log Sizes</name>
+      <type>String</type>
+      <value/>
+    </extension_attribute>
+    <extension_attribute>
+      <id>16</id>
+      <name>Parent JSS</name>
+      <type>String</type>
+      <value/>
+    </extension_attribute>
+    <extension_attribute>
+      <id>8</id>
+      <name>Parent Software Update Server</name>
+      <type>String</type>
+      <value/>
+    </extension_attribute>
+    <extension_attribute>
+      <id>29</id>
+      <name>RHEL - CasperShare Size</name>
+      <type>Number</type>
+      <value/>
+    </extension_attribute>
+    <extension_attribute>
+      <id>39</id>
+      <name>RHEL - Sudoers</name>
+      <type>String</type>
+      <value/>
+    </extension_attribute>
+    <extension_attribute>
+      <id>40</id>
+      <name>RHEL - User Check</name>
+      <type>String</type>
+      <value/>
+    </extension_attribute>
+    <extension_attribute>
+      <id>1</id>
+      <name>Server - App Version </name>
+      <type>String</type>
+      <value/>
+    </extension_attribute>
+    <extension_attribute>
+      <id>18</id>
+      <name>Server - DNS Search Domains</name>
+      <type>String</type>
+      <value/>
+    </extension_attribute>
+    <extension_attribute>
+      <id>17</id>
+      <name>Server - DNS Servers</name>
+      <type>String</type>
+      <value/>
+    </extension_attribute>
+    <extension_attribute>
+      <id>2</id>
+      <name>Server - Hostname</name>
+      <type>String</type>
+      <value/>
+    </extension_attribute>
+    <extension_attribute>
+      <id>5</id>
+      <name>Server - LaunchAgents</name>
+      <type>String</type>
+      <value/>
+    </extension_attribute>
+    <extension_attribute>
+      <id>4</id>
+      <name>Server - LaunchDaemons</name>
+      <type>String</type>
+      <value/>
+    </extension_attribute>
+    <extension_attribute>
+      <id>3</id>
+      <name>Service - Filesharing Paths</name>
+      <type>String</type>
+      <value/>
+    </extension_attribute>
+    <extension_attribute>
+      <id>7</id>
+      <name>Service - Netboot Status</name>
+      <type>String</type>
+      <value/>
+    </extension_attribute>
+    <extension_attribute>
+      <id>6</id>
+      <name>Service - Web Status</name>
+      <type>String</type>
+      <value/>
+    </extension_attribute>
+    <extension_attribute>
+      <id>38</id>
+      <name>Staging Enviroment</name>
+      <type>String</type>
+      <value/>
+    </extension_attribute>
+    <extension_attribute>
+      <id>10</id>
+      <name>SUS - htmlPath</name>
+      <type>String</type>
+      <value/>
+    </extension_attribute>
+    <extension_attribute>
+      <id>14</id>
+      <name>SUS - LastDateSync</name>
+      <type>Date</type>
+      <value/>
+    </extension_attribute>
+    <extension_attribute>
+      <id>11</id>
+      <name>SUS - metaPath</name>
+      <type>String</type>
+      <value/>
+    </extension_attribute>
+    <extension_attribute>
+      <id>13</id>
+      <name>SUS - ParentSUS</name>
+      <type>String</type>
+      <value/>
+    </extension_attribute>
+    <extension_attribute>
+      <id>9</id>
+      <name>SUS - RepoSync Path</name>
+      <type>String</type>
+      <value/>
+    </extension_attribute>
+    <extension_attribute>
+      <id>12</id>
+      <name>SUS - URLBase</name>
+      <type>String</type>
+      <value/>
+    </extension_attribute>
+  </extension_attributes>
+  <groups_accounts>
+    <computer_group_memberships/>
+    <local_accounts/>
+  </groups_accounts>
+  <iphones>
+    <size>0</size>
+  </iphones>
+  <configuration_profiles>
+    <size>0</size>
+  </configuration_profiles>
+</computer>

@@ -3,7 +3,6 @@
 #	This script is ment to be used in crontab or cron to control the JDS jamfds binary
 # in configurations where a Master DP is also the Root JDS and files are uploaded via SMB
 # to the CapserShare/Packages and then the Root JDS is used for replication.
-# This script is currently being ran on RHEL 6.6
 # Updated 10/26/15
 # Updated By Andrew Seago
 #
@@ -12,17 +11,13 @@
 # set -n	# EVALUATE. Check syntax of the script but dont execute
 ## Variables
 ####################################################################################################
+logName="/data/JDS_Policy.log"
 process_search_string="JDS_Policy.sh"
 self_pid=$$
-smbRWuser='' # User Casper Admin uses when connecting via SMB
-smbSharePath='' # Filepath to root CasperShare
-apacheUser='' # User Apache is running as
-apacheGroup='' # Group Apache is running as
-rootPath="/var/JDS_Policy"
-logName="$rootPath/JDS_Policy.log"
-pathToPackages="/www/html/CasperShare/Packages"
-PreviousNumberOfPackages=`cat "$rootPath/CasperSharePackageCount"`
-NumberOfPackages=`ls "$pathToPackages" | wc -w`
+smbRWuser='jdsrdw'
+PreviousNumberOfPackages=`cat /data/CasperSharePackageCount`
+NumberOfPackages=`ls /data/CasperShare/Packages | wc -w`
+smbSharePath='/data/CasperShare'
 FileUploading=''
 pidFile="/tmp/$process_search_string.pid"
 ## Functions
@@ -53,27 +48,27 @@ CheckUpload() {
     FilesInUse=`smbstatus --user="$smbRWuser" | grep 'RDONLY\|RDWR' | grep -vw "$smbSharePath   ."`
      if [ "$FilesInUse" != '' ]; then
        log "Files are being uploaded or used by $smbRWuser"
-       log "Sleeping for 15 min"
-       sleep 900
+       log "Sleeping for 2 min"
+       sleep 120
        log "Starting jamfds Inventory"
-       jamfds inventory
+       /usr/local/sbin/jamfds inventory
        log "jamfds Inventory has completed"
        log "Setting FileUpload status to 1"
        FileUploading=1
-       log "Waiting 2 minutes for JSS Cluster"
-       sleep 120
+       log "Waiting 30 Sec for JSS Cluster"
+       sleep 30
        log "Restarting CheckUpload function"
        CheckUpload
      fi
   elif [ "$FileUploading" = '1' ] || [ "$PreviousNumberOfPackages" != "$NumberOfPackages" ]; then
     log "File was previously uploaded or Number of Packages has changed"
-    log "Waiting 2 minutes for JSS Cluster"
-    sleep 120
+    log "Waiting 30 sec for JSS Cluster"
+    sleep 30
     log "Starting jamfds Inventory"
-    jamfds inventory
+    /usr/local/sbin/jamfds inventory
     log "jamfds Inventory has completed"
-    log "Waiting 2 minutes for JSS Cluster"
-    sleep 120
+    log "Waiting 30 sec for JSS Cluster"
+    sleep 30
     log "Setting FileUpload status to 0"
     FileUploading=0
   fi
@@ -84,19 +79,19 @@ inventory(){
   OLDIFS=$IFS
   IFS=$'\n'
   # read all file name into an array
-  for file in $(ls -1 "$pathToPackages");  do
-    fullPathTofile="$pathToPackages/$file"
+  for file in $(ls -1 /data/CasperShare/Packages);  do
+    fullPathTofile="/data/CasperShare/Packages/$file"
     ModTime=`stat "$fullPathTofile" | awk '/Modify: /' | sed 's/Modify: //'`
-    if [ -e "$rootPath/CasperShareInventory" ]; then
-      PreviousModTime=`grep "#$file#" "$rootPath/CasperShareInventory" | cut -d '#' -f3`
+    if [ -e '/data/CasperShareInventory' ]; then
+      PreviousModTime=`grep "#$file#" /data/CasperShareInventory | cut -d '#' -f3`
 			if [ "${PreviousModTime}" == "" ]; then
 				log "${file} not found in CasperShareInventory"
-				echo "#${file}#${ModTime}" >> "$rootPath/CasperShareInventory"
+				echo "#${file}#${ModTime}" >> /data/CasperShareInventory
       elif [ "${ModTime}" != "${PreviousModTime}" ]; then
         log "$file modification date has changed"
         log "Clearing MD5 Hash for $file"
         rm -Rf "$fullPathTofile.*"
-        sed -i -e  "s/#${file}#${PreviousModTime}/#${file}#${ModTime}/" "$rootPath/CasperShareInventory"
+        sed -i -e  "s/#${file}#${PreviousModTime}/#${file}#${ModTime}/" /data/CasperShareInventory
         log "Starting jamfds Inventory"
         CheckUpload
         log "jamfds Inventory has completed"
@@ -106,29 +101,29 @@ inventory(){
       log "Starting jamfds Inventory"
       CheckUpload
       log "jamfds Inventory has completed"
-      echo "#${file}#${ModTime}" >> "$rootPath/CasperShareInventory"
+      echo "#${file}#${ModTime}" >> /data/CasperShareInventory
     fi
   done
   IFS=$OLDIFS
 	log "Starting jamfds Inventory"
 	CheckUpload
 	log "jamfds Inventory has completed"
-	log "Waiting 2 minutes for JSS Cluster"
+	log "Waiting 30 sec for JSS Cluster"
 	sleep 120
 }
 InitializeScript () {
 	Check_Process_Running
 	log "Starting $process_search_string"
 	inventory
-	CheckUpload
 	log "Starting jamfds Policy"
-	jamfds policy
+	/usr/local/sbin/jamfds policy
 	log "jamfds Policy has completed"
-	NumberOfPackages=`ls "$pathToPackages" | wc -w`
+	NumberOfPackages=`ls /data/CasperShare/Packages | wc -w`
 	log "Writing new number of packages"
-	echo "$NumberOfPackages" > "$rootPath/CasperSharePackageCount"
+	echo "$NumberOfPackages" > /data/CasperSharePackageCount
 	log "Setting file permissions"
-	chown -Rf "$apacheUser":"$apacheGroup" "$pathToPackages"
+	chmod -Rf 777 /data/CasperShare/Packages
+	chown -Rf tomcat7:Sysops /data/CasperShare/Packages
 	log "JDS Policy complete"
 	log "Completed $process_search_string"
 	rm -f "$pidFile"
